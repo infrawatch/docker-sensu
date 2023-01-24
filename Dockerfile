@@ -1,7 +1,7 @@
-FROM ruby:2.5-slim-stretch
-MAINTAINER Shane Starcher <shanestarcher@gmail.com>
+FROM ruby:2.6.8-slim-stretch
+MAINTAINER Martin Magr <mmagr@redhat.com>
 
-ARG SENSU_VERSION=1.6.1-1
+ARG SENSU_VERSION=1.9.0
 ARG DUMB_INIT_VERSION=1.2.0
 ARG ENVTPL_VERSION=0.2.3
 
@@ -16,12 +16,8 @@ RUN \
     find /usr/share/i18n/locales ! -name en_US -type f -exec rm -v {} + &&\
     find /usr/share/i18n/charmaps ! -name UTF-8.gz -type f -exec rm -v {} + &&\
     # Install Sensu
-    curl -s https://sensu.global.ssl.fastly.net/apt/pubkey.gpg | apt-key add - &&\
-    echo "deb https://sensu.global.ssl.fastly.net/apt stretch main" > /etc/apt/sources.list.d/sensu.list &&\
-    apt-get update &&\
-    apt-get install -y sensu=${SENSU_VERSION} &&\
-    rm -rf /opt/sensu/embedded/lib/ruby/gems/2.5.0/{cache,doc}/* &&\
-    find /opt/sensu/embedded/lib/ruby/gems/ -name "*.o" -delete &&\
+    apt-get install -y rubygems build-essential &&\
+    gem install sensu -v ${SENSU_VERSION} &&\
     # Cleanup debian
     apt-get remove -y gnupg &&\
     apt-get autoremove -y &&\
@@ -41,7 +37,7 @@ RUN \
 COPY templates /etc/sensu/templates
 COPY bin /bin/
 
-RUN chgrp -R sensu /etc/sensu; mkdir -p /home/sensu; chown sensu:sensu /home/sensu
+RUN useradd sensu && chgrp -R sensu /etc/sensu
 USER sensu
 WORKDIR /home/sensu
 

@@ -1,0 +1,18 @@
+name: Unit test suite run
+on: push
+
+jobs:
+  image-build:
+    name: Image build
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Verify image builds via docker
+        run: |
+          docker build --tag infrawatch/sensu-docker:1.9.0-docker --file ${{ github.workspace }}/Dockerfile .
+      - name: Verify image builds via podman
+        run: |
+          podman build --tag infrawatch/sensu-docker:1.9.0-podman --file ${{ github.workspace }}/Dockerfile .
+      - name: List images
+        run: |
+          docker images

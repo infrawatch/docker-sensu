@@ -37,10 +37,6 @@ RUN \
 COPY templates /etc/sensu/templates
 COPY bin /bin/
 
-RUN useradd sensu && chgrp -R sensu /etc/sensu
-USER sensu
-WORKDIR /home/sensu
-
 ENV SENSU_VERSION=${SENSU_VERSION} \
     DEFAULT_PLUGINS_REPO=sensu-plugins \
     DEFAULT_PLUGINS_VERSION=master \
